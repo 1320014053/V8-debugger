@@ -10,6 +10,7 @@ byte g_SaveByte[256] = { 0 };
 HANDLE g_process;
 HANDLE g_thread;
 DWORD64 g_LastAddress;
+int TotaltTriggered=0;
 
 char* join(char* s1, char* s2) {
     char* result = malloc(strlen(s1) + strlen(s2) + 1);
@@ -152,9 +153,9 @@ int OnException(const EXCEPTION_DEBUG_INFO* pInfo) {
     printf("ExceptionCode: %p\r\n", pInfo->ExceptionRecord.ExceptionCode);
     printf("ExceptionAddress: %p\r\n\r\n", pInfo->ExceptionRecord.ExceptionAddress);
     DWORD64 kk = (DWORD64)pInfo->ExceptionRecord.ExceptionAddress;
-    kk = kk >> 32;
+    kk = kk >> 36;
 
-    if (kk == 0x7FFF) {
+    if (kk == 0x7FF) {
         return DBG_EXCEPTION_NOT_HANDLED;
     }
 
@@ -174,6 +175,8 @@ int OnException(const EXCEPTION_DEBUG_INFO* pInfo) {
         SetThreadContext(g_thread, &context);
         g_LastAddress = context.Rip;
         printf("JumpIfFalseHadler is triggered\r\n\r\n");
+        TotaltTriggered++;
+        printf("JumpIfFalseHadler triggered:%d\r\n\r\n", TotaltTriggered);
     }
     return 0;
 }
